@@ -96,7 +96,7 @@ h1, h2, h3, h4, h5, h6 {
   overflow-y: auto;
   position: relative;
   border-radius: 38px;
-  padding-top: 16px; /* Bezel-less ekran için şık bir üst boşluk */
+  padding-top: calc(env(safe-area-inset-top, 0px) + 16px); /* Çentik desteği ve bezel-less ekran için şık bir üst boşluk */
   scrollbar-width: none; /* Firefox */
 }
 
@@ -118,6 +118,7 @@ h1, h2, h3, h4, h5, h6 {
   body {
     background: var(--color-bg-light);
     padding: 0;
+    overscroll-behavior-y: contain; /* PWA elastik kaydırmasını sınırlandırır */
   }
   .mobile-frame-wrapper {
     max-width: 100%;
@@ -130,6 +131,9 @@ h1, h2, h3, h4, h5, h6 {
   }
   .mobile-frame-notch {
     display: none;
+  }
+  .screen {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 110px); /* Alt navbar alanı için safe-area dolgusu */
   }
 }
 
@@ -172,6 +176,8 @@ h1, h2, h3, h4, h5, h6 {
   .navbar {
     border-radius: 0;
     position: fixed;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+    height: calc(env(safe-area-inset-bottom, 0px) + 76px);
   }
 }
 
