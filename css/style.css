@@ -1,0 +1,950 @@
+/*
+ * FerahFinans - Zen Mint Tasarım Sistemi ve Stil Dosyası
+ * Büyüleyici, sade, iç ferahlatıcı ve şık arayüz tasarımı.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Temel Zen Mint Renk Paleti */
+  --color-bg-light: hsl(120, 24%, 97%);
+  --color-mint-light: hsl(140, 36%, 93%);
+  --color-mint-deep: hsl(142, 60%, 42%);
+  --color-mint-hover: hsl(142, 60%, 35%);
+  --color-sage: hsl(142, 22%, 74%);
+  --color-forest: hsl(142, 45%, 14%);
+  --color-cream: hsl(45, 30%, 98%);
+  --color-accent-amber: hsl(42, 90%, 52%);
+  --color-accent-red: hsl(0, 75%, 60%);
+  --color-accent-blue: hsl(200, 85%, 55%);
+  
+  /* Kart & Cam Efektleri */
+  --color-card-bg: rgba(255, 255, 255, 0.72);
+  --color-card-bg-hover: rgba(255, 255, 255, 0.88);
+  --color-card-border: rgba(255, 255, 255, 0.5);
+  --color-shadow: rgba(27, 94, 32, 0.06);
+  --color-shadow-hover: rgba(27, 94, 32, 0.12);
+  
+  /* Yazı Renkleri */
+  --color-text: hsl(142, 35%, 12%);
+  --color-text-muted: hsl(142, 10%, 44%);
+  --color-text-on-dark: hsl(120, 30%, 98%);
+  
+  /* Tipografi */
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  
+  /* Sınırlar */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+  --transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Sıfırlama ve Temel Yapı */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-body);
+  background: radial-gradient(circle at 10% 20%, hsl(120, 30%, 95%) 0%, var(--color-bg-light) 90%);
+  color: var(--color-text);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--color-forest);
+}
+
+/* === MASAÜSTÜ İÇİN TELEFON ÇERÇEVESİ SİMÜLATÖRÜ === */
+.mobile-frame-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  height: 860px;
+  background: #111;
+  border-radius: 48px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 12px #262626, 0 0 0 13px #171717;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Telefon Çentiği (Dynamic Island Tarzı) */
+.mobile-frame-notch {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 110px;
+  height: 28px;
+  background: #000;
+  border-radius: var(--radius-full);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-frame-camera {
+  width: 8px;
+  height: 8px;
+  background: #1f2937;
+  border-radius: 50%;
+}
+
+/* Durum Çubuğu */
+.mobile-status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px 8px 24px;
+  height: 44px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+  background: transparent;
+  z-index: 999;
+}
+
+.status-left {
+  letter-spacing: -0.2px;
+}
+
+.status-right {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* Uygulama Ana Konteyneri */
+.app-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(ellipse at bottom, var(--color-mint-light) 0%, var(--color-bg-light) 100%);
+  overflow-y: auto;
+  position: relative;
+  border-radius: 38px 38px 0 0;
+  scrollbar-width: none; /* Firefox */
+}
+
+.app-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+/* Çevrimdışı ve Pürüzsüz Arayüz İçin Kaydırma Çubuğu Gizleme */
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+/* Mobil Ekranda Çerçeveyi Gizleme */
+@media (max-width: 480px) {
+  body {
+    background: var(--color-bg-light);
+    padding: 0;
+  }
+  .mobile-frame-wrapper {
+    max-width: 100%;
+    height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .app-container {
+    border-radius: 0;
+  }
+  .mobile-frame-notch {
+    display: none;
+  }
+}
+
+/* === SAYFALAR VE YÖNLENDİRME === */
+.screen {
+  display: none;
+  flex-direction: column;
+  width: 100%;
+  padding: 16px 20px 100px 20px;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.screen.active {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* === ALT NAVİGASYON MENÜSÜ === */
+.navbar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 76px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--color-card-border);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 12px 10px 12px;
+  z-index: 900;
+  border-radius: 0 0 38px 38px;
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    border-radius: 0;
+    position: fixed;
+  }
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 500;
+  transition: var(--transition);
+  cursor: pointer;
+  width: 60px;
+  height: 52px;
+  border-radius: var(--radius-md);
+}
+
+.nav-item svg {
+  width: 22px;
+  height: 22px;
+  margin-bottom: 3px;
+  transition: var(--transition);
+}
+
+.nav-item.active {
+  color: var(--color-mint-deep);
+  font-weight: 600;
+}
+
+.nav-item.active svg {
+  transform: translateY(-2px);
+  stroke-width: 2.5;
+}
+
+/* === GLASSMORPHISM KART SİSTEMİ === */
+.card {
+  background: var(--color-card-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 32px 0 var(--color-shadow);
+  transition: var(--transition);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px 0 var(--color-shadow-hover);
+  background: var(--color-card-bg-hover);
+}
+
+.card-title {
+  font-size: 15px;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-forest);
+  font-family: var(--font-heading);
+}
+
+/* === PIN KODU EKRANI (Şık ve Akıcı) === */
+.pin-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, var(--color-mint-light) 0%, var(--color-bg-light) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  padding: 40px 24px;
+}
+
+.pin-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.pin-subtitle {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.pin-indicator-container {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 50px;
+}
+
+.pin-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2.5px solid var(--color-sage);
+  background: transparent;
+  transition: var(--transition);
+}
+
+.pin-dot.filled {
+  background: var(--color-mint-deep);
+  border-color: var(--color-mint-deep);
+  transform: scale(1.15);
+}
+
+.pin-dot.error {
+  background: var(--color-accent-red);
+  border-color: var(--color-accent-red);
+  animation: shake 0.4s;
+}
+
+.pin-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 270px;
+}
+
+.pin-btn {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  border: 1px solid var(--color-card-border);
+  background: var(--color-card-bg);
+  box-shadow: 0 4px 12px var(--color-shadow);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--color-forest);
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(8px);
+}
+
+.pin-btn:active {
+  transform: scale(0.9);
+  background: var(--color-mint-light);
+}
+
+.pin-btn-action {
+  font-size: 15px;
+  color: var(--color-text-muted);
+  background: transparent;
+  box-shadow: none;
+  border: none;
+}
+
+/* === BUTONLAR VE İNTERAKTİF ELEMANLAR === */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: var(--radius-full);
+  border: none;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--transition);
+  gap: 8px;
+}
+
+.btn-primary {
+  background: var(--color-mint-deep);
+  color: var(--color-text-on-dark);
+}
+
+.btn-primary:hover {
+  background: var(--color-mint-hover);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: scale(0.96);
+}
+
+.btn-secondary {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-sage);
+  color: var(--color-forest);
+}
+
+.btn-secondary:hover {
+  background: var(--color-mint-light);
+  transform: translateY(-1px);
+}
+
+.btn-secondary:active {
+  transform: scale(0.96);
+}
+
+.btn-danger {
+  background: hsl(0, 75%, 95%);
+  color: var(--color-accent-red);
+}
+
+.btn-danger:hover {
+  background: var(--color-accent-red);
+  color: white;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-card-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-forest);
+  box-shadow: 0 4px 12px var(--color-shadow);
+  transition: var(--transition);
+}
+
+.icon-btn:active {
+  transform: scale(0.92);
+}
+
+/* === FORM ELEMANLARI VE MODALLAR === */
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(27, 94, 32, 0.15);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-content {
+  width: 100%;
+  background: radial-gradient(ellipse at top, #ffffff 0%, var(--color-bg-light) 100%);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  border-top: 1px solid var(--color-card-border);
+  padding: 24px;
+  max-height: 80%;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.08);
+}
+
+.modal-overlay.active .modal-content {
+  transform: translateY(0);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--color-text-muted);
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-sage);
+  background: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text);
+  outline: none;
+  transition: var(--transition);
+}
+
+.form-input:focus {
+  border-color: var(--color-mint-deep);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+/* === LİSTELER VE İŞLEM DETAYLARI === */
+.transaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 16px var(--color-shadow);
+  transition: var(--transition);
+}
+
+.transaction-item:hover {
+  background: white;
+  transform: scale(1.01);
+}
+
+.transaction-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.category-icon-wrapper {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.transaction-details h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.transaction-details p {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.transaction-amount {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.transaction-amount.income {
+  color: var(--color-mint-deep);
+}
+
+.transaction-amount.expense {
+  color: var(--color-accent-red);
+}
+
+/* === CANLI FİYAT TICKER ANİMASYONU === */
+.ticker-flash-up {
+  animation: bg-flash-up 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ticker-flash-down {
+  animation: bg-flash-down 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes bg-flash-up {
+  0% { background-color: rgba(16, 185, 129, 0.35); }
+  100% { background-color: transparent; }
+}
+
+@keyframes bg-flash-down {
+  0% { background-color: rgba(239, 68, 68, 0.35); }
+  100% { background-color: transparent; }
+}
+
+/* === ANİMASYONLU BİTKİ BÜYÜTÜCÜ KURALLARI === */
+.plant-widget-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px;
+  overflow: hidden;
+}
+
+.plant-svg-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin-bottom: 12px;
+}
+
+/* Büyüme Animasyonları */
+@keyframes grow-leaf {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes draw-path {
+  from { stroke-dashoffset: 200; }
+  to { stroke-dashoffset: 0; }
+}
+
+.grow-leaf-anim {
+  transform-origin: bottom center;
+  animation: grow-leaf 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.draw-path-anim {
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  animation: draw-path 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.fade-in-flower {
+  opacity: 0;
+  animation: fade-in 1s 0.8s ease-out forwards;
+}
+
+@keyframes fade-in {
+  to { opacity: 1; }
+}
+
+/* Altın Işıltı Animasyonu */
+.glow-pulse {
+  animation: glow-pulse-anim 3s infinite ease-in-out;
+}
+
+@keyframes glow-pulse-anim {
+  0% { opacity: 0.1; transform: scale(0.9); }
+  50% { opacity: 0.25; transform: scale(1.1); }
+  100% { opacity: 0.1; transform: scale(0.9); }
+}
+
+.sparkle-anim {
+  animation: sparkle-glow 2s infinite ease-in-out;
+  transform-origin: center;
+}
+
+.sparkle-anim-fast {
+  animation: sparkle-glow 1.2s infinite ease-in-out;
+  transform-origin: center;
+}
+
+.sparkle-anim-slow {
+  animation: sparkle-glow 3.2s infinite ease-in-out;
+  transform-origin: center;
+}
+
+@keyframes sparkle-glow {
+  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+  50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+  100% { transform: scale(0) rotate(360deg); opacity: 0; }
+}
+
+/* Deprem sallantısı (PIN Hatalı girişte) */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* === RAPOR DIŞA AKTARMA VE PDF BASKI MODU === */
+.report-balance-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.report-mini-card {
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--color-card-border);
+}
+
+.report-mini-card.success {
+  background: hsl(120, 30%, 93%);
+  border-color: hsl(120, 25%, 85%);
+}
+
+.report-mini-card.danger {
+  background: hsl(0, 50%, 96%);
+  border-color: hsl(0, 40%, 90%);
+}
+
+.chart-container {
+  height: 200px;
+  position: relative;
+  margin: 16px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Yazıcı/PDF baskısı için mükemmel stil optimizasyonu */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 15mm 15mm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #1c1917 !important;
+    font-size: 11pt !important;
+    display: block !important;
+  }
+  
+  .mobile-frame-wrapper {
+    box-shadow: none !important;
+    border: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    height: auto !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  
+  .navbar, 
+  .mobile-status-bar, 
+  .mobile-frame-notch, 
+  .icon-btn, 
+  .btn, 
+  .plant-widget-card,
+  #report-filter-bar,
+  .reports-header-row {
+    display: none !important;
+  }
+  
+  .app-container {
+    background: transparent !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+  
+  /* Sadece rapor ekranı yazdırılsın */
+  .screen {
+    display: none !important;
+  }
+  
+  #screen-reports {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: auto auto auto 1fr 1fr !important;
+    gap: 15px !important;
+    width: 100% !important;
+    height: 256mm !important;
+    max-height: 256mm !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+
+  /* Üst bölümleri iki sütuna yay */
+  .print-header-container,
+  #report-title-month,
+  .report-balance-summary {
+    grid-column: span 2 !important;
+  }
+
+  /* Üst logo ve başlık payını küçültelim */
+  .print-header-container > div {
+    margin-bottom: 12px !important;
+    padding-bottom: 8px !important;
+  }
+  
+  /* Kartları düz kağıt baskı düzenine çek ve yükseklikleri tam sayfaya sığacak şekilde optimize et */
+  .card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    margin-bottom: 0 !important;
+    page-break-inside: avoid !important;
+    padding: 12px 18px !important;
+    box-sizing: border-box !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+  }
+  
+  /* Kartların içindeki metrik div elemanlarını yayarak dikey boşluğu doldur */
+  .card > div:not(.chart-container) {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-around !important;
+    height: 100% !important;
+  }
+  
+  .report-balance-summary {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 15px !important;
+    margin-bottom: 5px !important;
+  }
+  
+  .report-mini-card {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    padding: 8px 14px !important;
+  }
+  
+  .report-mini-card.success {
+    background: #f0fdf4 !important;
+    border-color: #bbf7d0 !important;
+  }
+  
+  .report-mini-card.danger {
+    background: #fef2f2 !important;
+    border-color: #fecaca !important;
+  }
+  
+  /* Grafik boyutlarını A4 tek sayfayı dolduracak şekilde optimize et */
+  .chart-container {
+    height: 100% !important;
+    flex: 1 !important;
+    max-height: none !important;
+    margin: 4px 0 !important;
+    padding: 0 !important;
+    position: relative !important;
+    display: block !important;
+    page-break-inside: avoid !important;
+  }
+
+  .chart-container canvas {
+    max-height: 100% !important;
+    max-width: 100% !important;
+  }
+
+  #report-title-month {
+    font-size: 18px !important;
+    margin-bottom: 6px !important;
+    margin-top: 0px !important;
+    text-align: center !important;
+  }
+
+  .card h3 {
+    font-size: 13px !important;
+    margin-bottom: 6px !important;
+    font-weight: 600 !important;
+    color: var(--color-forest) !important;
+  }
+}
+
+/* =========================================================================
+   === 4. BİRİKİM AĞACI OYUNLAŞTIRMA ANİMASYONLARI ===
+   ========================================================================= */
+
+/* Rüzgarda Hafifçe Sallanan Ağaç */
+.sway-anim {
+  transform-origin: 100px 150px;
+  animation: tree-sway 6s infinite ease-in-out;
+}
+
+@keyframes tree-sway {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(1.8deg); }
+}
+
+/* Meyve Büyüme Animasyonu */
+.grow-apple-anim {
+  transform-origin: center;
+  animation: apple-pop 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes apple-pop {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Çiçek Açma Animasyonu */
+.bloom-flower-anim {
+  transform-origin: center;
+  animation: flower-bloom 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes flower-bloom {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Meyveli Ağaç Altın Işıltı Efekti */
+.glow-gold-pulse {
+  animation: gold-glow-pulse 4s infinite ease-in-out;
+}
+
+@keyframes gold-glow-pulse {
+  0%, 100% { opacity: 0.15; transform: scale(0.95); }
+  50% { opacity: 0.3; transform: scale(1.05); }
+}
