@@ -15,8 +15,115 @@ const STORAGE_KEYS = {
   NAME: 'ferahfinans_name',
   GOALS: 'ferahfinans_goals',
   IS_INITIALIZED: 'ferahfinans_initialized',
-  WEALTH_GOAL: 'ferahfinans_wealth_goal'
+  WEALTH_GOAL: 'ferahfinans_wealth_goal',
+  BUDGET_LIMITS: 'ferahfinans_budget_limits',
+  ALLOCATION_TARGETS: 'ferahfinans_allocation_targets',
+  THEME: 'ferahfinans_theme'
 };
+
+const DEFAULT_BUDGET_LIMITS = {
+  rent: 15000,
+  groceries: 6000,
+  dining: 4000,
+  bills: 3000,
+  transport: 2000,
+  entertainment: 2500,
+  other_expense: 4000
+};
+
+const DEFAULT_ALLOCATION_TARGETS = {
+  gold: 25,
+  silver: 10,
+  stock: 25,
+  fund: 15,
+  bes: 10,
+  currency: 10,
+  cash: 5,
+  other: 0
+};
+
+const ZEN_QUOTES = [
+  "Ferah bir zihin, en büyük varlıktır. Bütçeni sadeleştir, zihnin hafiflesin. 🍃",
+  "Küçük birikimler, gelecekte gölgesinde dinleneceğin koca bir çınarın tohumlarıdır. 🌳",
+  "İhtiyaçlar ile istekler arasındaki dengeyi bulduğun an, gerçek finansal özgürlüğe ulaşırsın. ⚖️",
+  "Bütçe bir sınırlama değil, paranın nereye gideceğine senin karar vermendir. 🍃",
+  "Zen öğretisi der ki: Sahip oldukların sana sahip olmasın. Sadeleş ve özgürleş. ✨",
+  "Akışta kal. Bazen harcamaları kısmak, zihnini en çok ferahlatan meditasyondur. 🌊",
+  "Birikim ağacın sabırla büyür. Sabır, finansal refahın gizli bahçıvanıdır. 🌸",
+  "Parayı yönetmek zihni yönetmektir. Harcarken sakin, biriktirirken kararlı ol. 🍃",
+  "Finansal huzur, ne kadar çok kazandığınla değil, elindekini ne kadar dingin yönettiğinle ilgilidir. 🧘",
+  "Tasarruf, gelecekteki özgürlüğünü bugünden satın almaktır. 🍃"
+];
+
+function getBudgetLimits() {
+  const limits = localStorage.getItem(STORAGE_KEYS.BUDGET_LIMITS);
+  if (!limits) return DEFAULT_BUDGET_LIMITS;
+  try {
+    return JSON.parse(limits);
+  } catch (e) {
+    return DEFAULT_BUDGET_LIMITS;
+  }
+}
+
+function setBudgetLimits(newLimits) {
+  localStorage.setItem(STORAGE_KEYS.BUDGET_LIMITS, JSON.stringify(newLimits));
+  return true;
+}
+
+function getAllocationTargets() {
+  const targets = localStorage.getItem(STORAGE_KEYS.ALLOCATION_TARGETS);
+  if (!targets) return DEFAULT_ALLOCATION_TARGETS;
+  try {
+    return JSON.parse(targets);
+  } catch (e) {
+    return DEFAULT_ALLOCATION_TARGETS;
+  }
+}
+
+function setAllocationTargets(newTargets) {
+  localStorage.setItem(STORAGE_KEYS.ALLOCATION_TARGETS, JSON.stringify(newTargets));
+  return true;
+}
+
+function getAppTheme() {
+  return localStorage.getItem(STORAGE_KEYS.THEME) || 'light';
+}
+
+function setAppTheme(theme) {
+  localStorage.setItem(STORAGE_KEYS.THEME, theme);
+  return theme;
+}
+
+function displayDailyZenQuote() {
+  const quoteEl = document.getElementById('zen-quote-text');
+  if (quoteEl) {
+    const day = new Date().getDate();
+    const idx = day % ZEN_QUOTES.length;
+    quoteEl.textContent = ZEN_QUOTES[idx];
+  }
+}
+
+function updateTargetAllocationTotalSum() {
+  const gold = parseFloat(document.getElementById('target-gold').value) || 0;
+  const silver = parseFloat(document.getElementById('target-silver').value) || 0;
+  const stock = parseFloat(document.getElementById('target-stock').value) || 0;
+  const fund = parseFloat(document.getElementById('target-fund').value) || 0;
+  const bes = parseFloat(document.getElementById('target-bes').value) || 0;
+  const currency = parseFloat(document.getElementById('target-currency').value) || 0;
+  const cash = parseFloat(document.getElementById('target-cash').value) || 0;
+  const other = parseFloat(document.getElementById('target-other').value) || 0;
+  
+  const total = gold + silver + stock + fund + bes + currency + cash + other;
+  const checkEl = document.getElementById('target-total-check');
+  if (checkEl) {
+    checkEl.textContent = `Toplam: %${total}`;
+    if (total === 100) {
+      checkEl.style.color = 'var(--color-mint-deep)';
+    } else {
+      checkEl.style.color = 'var(--color-accent-red)';
+    }
+  }
+}
 
 const CATEGORIES = {
   INCOME: {
@@ -629,8 +736,14 @@ const state = {
 document.addEventListener('DOMContentLoaded', () => {
   initDatabase();
   lucide.createIcons();
-  updateLiveClock();
-  setInterval(updateLiveClock, 30000);
+  
+  // Set theme on start
+  const savedTheme = getAppTheme();
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-theme');
+  } else {
+    document.body.classList.remove('dark-theme');
+  }
   
   setupSecurity();
   registerEvents();
@@ -880,7 +993,7 @@ function updateDashboard() {
       recentContainer.appendChild(createTransactionRow(tx));
     });
   }
-  
+  displayDailyZenQuote();
   lucide.createIcons();
 }
 
@@ -903,6 +1016,29 @@ function updateTransactions() {
   
   sortedTxs.forEach(tx => {
     const row = createTransactionRow(tx, true); 
+    
+    if (tx.type === 'expense') {
+      const limits = getBudgetLimits();
+      const limit = limits[tx.category] || 0;
+      if (limit > 0) {
+        const yearMonth = tx.date.substring(0, 7);
+        let monthlySpent = 0;
+        transactions.forEach(t => {
+          if (t.type === 'expense' && t.category === tx.category && t.date && t.date.substring(0, 7) === yearMonth) {
+            monthlySpent += t.amount;
+          }
+        });
+        
+        if (monthlySpent >= limit) {
+          row.classList.add('limit-exceeded');
+          row.title = `Bu kategorinin aylık bütçesi (${limit.toLocaleString('tr-TR')} ₺) aşıldı!`;
+        } else if (monthlySpent >= limit * 0.8) {
+          row.classList.add('limit-warning');
+          row.title = `Bu kategorinin aylık bütçesi sınırda!`;
+        }
+      }
+    }
+    
     container.appendChild(row);
   });
   
@@ -1106,6 +1242,80 @@ function populateReportMonthDropdown() {
   }
 }
 
+function getChartThemeColors() {
+  const isDark = document.body.classList.contains('dark-theme');
+  return {
+    textColor: isDark ? '#cbd5e1' : '#475569',
+    gridColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+    legendColor: isDark ? '#f1f5f9' : '#1e293b'
+  };
+}
+
+function calculateWellnessScore(savingsRate, investmentEarnings, totalCost, monthlyCategoryExpenses, limits) {
+  let savingsScore = 0;
+  if (savingsRate >= 40) {
+    savingsScore = 40;
+  } else if (savingsRate > 0) {
+    savingsScore = savingsRate * 1.0;
+  }
+  
+  let investmentScore = 20; 
+  if (totalCost > 0) {
+    const roi = (investmentEarnings / totalCost) * 100;
+    if (roi > 0) {
+      investmentScore = Math.min(20 + roi * 2, 30);
+    } else {
+      investmentScore = Math.max(20 + roi * 1.5, 0);
+    }
+  }
+  
+  let budgetScore = 30; 
+  Object.keys(limits).forEach(cat => {
+    const spent = monthlyCategoryExpenses[cat] || 0;
+    const limit = limits[cat] || 0;
+    if (limit > 0) {
+      if (spent >= limit) {
+        budgetScore -= 8;
+      } else if (spent >= limit * 0.8) {
+        budgetScore -= 3;
+      }
+    }
+  });
+  budgetScore = Math.max(budgetScore, 0);
+  
+  const totalScore = Math.round(savingsScore + investmentScore + budgetScore);
+  return Math.min(Math.max(totalScore, 0), 100);
+}
+
+function getWellnessDescription(score) {
+  if (score >= 90) {
+    return {
+      badge: "Kusursuz Dinginlik 🌌",
+      text: "Mükemmel finansal denge! Zihniniz ve bütçeniz tam bir uyum içinde. Ferah esintiler altındasınız."
+    };
+  } else if (score >= 75) {
+    return {
+      badge: "Ferah Rüzgarlar 🍃",
+      text: "Çok başarılı! Birikim fidanınız sağlıklı büyüyor, ufak tefek bütçe dalgalanmaları dışında her şey kontrol altında."
+    };
+  } else if (score >= 50) {
+    return {
+      badge: "Dengeli Yaşam ⚖️",
+      text: "Bütçeniz dengede fakat gelişim alanları var. Tasarruflarınızı biraz artırarak daha huzurlu hissedebilirsiniz."
+    };
+  } else if (score >= 30) {
+    return {
+      badge: "Gelişen Toprak 🌱",
+      text: "Tohum ekilmiş fakat daha fazla ilgi istiyor. Bütçenizi aşan bazı harcama kategorilerine sınır getirmek faydalı olacaktır."
+    };
+  } else {
+    return {
+      badge: "Dalgalı Denizler 🌊",
+      text: "Finansal akışınızda bazı tıkanıklıklar var. Harcamalarınızı gözden geçirmek zihninizi ve cebinizi rahatlatacaktır."
+    };
+  }
+}
+
 function renderTrendChart() {
   const canvas = document.getElementById('report-trend-chart');
   if (!canvas) return;
@@ -1116,7 +1326,6 @@ function renderTrendChart() {
     state.charts.trend.destroy();
   }
   
-  // Son 6 ayın dönemlerini dinamik oluştur
   const sortedMonths = [];
   const now = new Date();
   for (let i = 5; i >= 0; i--) {
@@ -1162,6 +1371,8 @@ function renderTrendChart() {
     }
     savingsRateData.push(rate);
   });
+  
+  const c = getChartThemeColors();
   
   state.charts.trend = new Chart(ctx, {
     type: 'bar',
@@ -1211,6 +1422,7 @@ function renderTrendChart() {
           position: 'bottom',
           labels: {
             boxWidth: 12,
+            color: c.textColor,
             font: { size: 10, family: 'Inter' }
           }
         }
@@ -1220,8 +1432,9 @@ function renderTrendChart() {
           type: 'linear',
           display: true,
           position: 'left',
-          grid: { display: false },
+          grid: { color: c.gridColor },
           ticks: {
+            color: c.textColor,
             font: { size: 9 },
             callback: function(value) {
               if (value >= 1000) return (value / 1000) + 'k ₺';
@@ -1237,6 +1450,7 @@ function renderTrendChart() {
           min: -50,
           max: 100,
           ticks: {
+            color: c.textColor,
             font: { size: 9 },
             callback: function(value) {
               return '%' + value;
@@ -1245,7 +1459,7 @@ function renderTrendChart() {
         },
         x: {
           grid: { display: false },
-          ticks: { font: { size: 10 } }
+          ticks: { color: c.textColor, font: { size: 10 } }
         }
       }
     }
@@ -1311,6 +1525,11 @@ function updateReports() {
     printUserNameEl.textContent = getUserName() || "Ferah Kullanıcısı";
   }
   
+  const printSignatureEl = document.getElementById('print-signature-name');
+  if (printSignatureEl) {
+    printSignatureEl.textContent = getUserName() || "Ferah Kullanıcısı";
+  }
+  
   const printDateEl = document.getElementById('print-date');
   if (printDateEl) {
     const todayStr = formatDate(new Date().toISOString().split('T')[0]);
@@ -1356,6 +1575,170 @@ function updateReports() {
   totalGrowthEl.textContent = `${totalGrowthVal >= 0 ? '+' : ''}${formatCurrency(totalGrowthVal)}`;
   totalGrowthEl.style.color = totalGrowthVal >= 0 ? 'var(--color-mint-deep)' : 'var(--color-accent-red)';
   
+  // A. Kategori Giderleri ve Bütçe Kontrolü
+  const limits = getBudgetLimits();
+  const monthlyCategoryExpenses = {};
+  Object.keys(CATEGORIES.EXPENSE).forEach(c => monthlyCategoryExpenses[c] = 0);
+  
+  transactions.forEach(t => {
+    if (t.type === 'expense') {
+      if (monthlyCategoryExpenses[t.category] !== undefined) {
+        monthlyCategoryExpenses[t.category] += t.amount;
+      } else {
+        monthlyCategoryExpenses[t.category] = t.amount;
+      }
+    }
+  });
+  
+  const limitsListContainer = document.getElementById('report-budget-limits-list');
+  if (limitsListContainer) {
+    limitsListContainer.innerHTML = '';
+    let hasLimits = false;
+    
+    Object.keys(limits).forEach(cat => {
+      const limit = limits[cat] || 0;
+      if (limit > 0) {
+        hasLimits = true;
+        const spent = monthlyCategoryExpenses[cat] || 0;
+        const percent = Math.min((spent / limit) * 100, 100);
+        const catInfo = CATEGORIES.EXPENSE[cat] || { label: cat, color: 'var(--color-sage)' };
+        
+        let badgeColor = 'var(--color-mint-deep)';
+        if (spent >= limit) {
+          badgeColor = 'var(--color-accent-red)';
+        } else if (spent >= limit * 0.8) {
+          badgeColor = 'var(--color-accent-amber)';
+        }
+        
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.flexDirection = 'column';
+        row.style.gap = '4px';
+        row.style.fontSize = '12px';
+        row.style.padding = '8px 12px';
+        row.style.background = 'rgba(255, 255, 255, 0.05)';
+        row.style.border = '1px solid var(--color-card-border)';
+        row.style.borderRadius = 'var(--radius-sm)';
+        
+        if (spent >= limit) {
+          row.classList.add('limit-exceeded');
+        } else if (spent >= limit * 0.8) {
+          row.classList.add('limit-warning');
+        }
+        
+        row.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <strong style="color: var(--color-forest);">${catInfo.label}</strong>
+            <span style="font-size: 11px; font-weight: 600; color: ${badgeColor};">${spent.toLocaleString('tr-TR')} ₺ / ${limit.toLocaleString('tr-TR')} ₺ (${percent.toFixed(0)}%)</span>
+          </div>
+          <div style="width: 100%; background: var(--color-mint-light); height: 6px; border-radius: var(--radius-full); overflow: hidden; margin-top: 2px;">
+            <div style="background: ${badgeColor}; width: ${percent}%; height: 100%; transition: width 0.8s ease-in-out;"></div>
+          </div>
+        `;
+        limitsListContainer.appendChild(row);
+      }
+    });
+    
+    if (!hasLimits) {
+      limitsListContainer.innerHTML = `<div style="text-align: center; color: var(--color-text-muted); font-size: 12px; padding: 16px;">Henüz bütçe limiti belirlenmiş gider kategorisi bulunmamaktadır.</div>`;
+    }
+  }
+  
+  // B. Wellness Score Hesaplama ve Çizim
+  const score = calculateWellnessScore(savingsRate, investmentEarnings, totalCost, monthlyCategoryExpenses, limits);
+  const wellness = getWellnessDescription(score);
+  
+  document.getElementById('report-wellness-score').textContent = score;
+  document.getElementById('report-wellness-text').textContent = wellness.text;
+  document.getElementById('report-wellness-badge').textContent = wellness.badge;
+  
+  const circle = document.getElementById('report-wellness-circle');
+  if (circle) {
+    circle.style.strokeDasharray = `${score} 100`;
+  }
+  
+  // C. Dağılım Kıyaslama Tablosu Çizimi
+  const allocationTbody = document.getElementById('report-allocation-tbody');
+  if (allocationTbody) {
+    allocationTbody.innerHTML = '';
+    const targets = getAllocationTargets();
+    
+    let totalIncomeAllTime = 0;
+    let totalExpenseAllTime = 0;
+    getTransactions().forEach(t => {
+      if (t.type === 'income') totalIncomeAllTime += t.amount;
+      else totalExpenseAllTime += t.amount;
+    });
+    const currentActualCash = totalIncomeAllTime - totalExpenseAllTime;
+    const actualCashVal = currentActualCash >= 0 ? currentActualCash : 0;
+    
+    const assetsByType = {
+      gold: 0,
+      silver: 0,
+      stock: 0,
+      fund: 0,
+      bes: 0,
+      currency: 0,
+      cash: actualCashVal,
+      other: 0
+    };
+    
+    assets.forEach(asset => {
+      const currentPrice = asset.currentPrice !== undefined ? asset.currentPrice : asset.avgPrice;
+      const val = asset.quantity * currentPrice;
+      if (assetsByType[asset.type] !== undefined) {
+        assetsByType[asset.type] += val;
+      } else {
+        assetsByType.other += val;
+      }
+    });
+    
+    const totalPortfolioVal = Object.values(assetsByType).reduce((x, y) => x + y, 0);
+    
+    const assetLabels = {
+      gold: 'Altın',
+      silver: 'Gümüş',
+      stock: 'Hisse Senedi',
+      fund: 'Yatırım Fonu',
+      bes: 'BES Fonu',
+      currency: 'Döviz',
+      cash: 'Nakit (TL)',
+      other: 'Diğer'
+    };
+    
+    Object.keys(assetsByType).forEach(type => {
+      const bal = assetsByType[type];
+      const targetPct = targets[type] !== undefined ? targets[type] : 0;
+      const actualPct = totalPortfolioVal > 0 ? (bal / totalPortfolioVal) * 100 : 0;
+      const deviation = actualPct - targetPct;
+      
+      let devColor = 'var(--color-text-muted)';
+      let devSign = '';
+      if (deviation > 1) {
+        devColor = 'var(--color-accent-amber)';
+        devSign = '+';
+      } else if (deviation < -1) {
+        devColor = 'var(--color-accent-red)';
+      } else {
+        devColor = 'var(--color-mint-deep)';
+      }
+      
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid var(--color-card-border)';
+      tr.innerHTML = `
+        <td style="padding: 6px 2px; font-weight: 500;">${assetLabels[type]}</td>
+        <td style="padding: 6px 2px; text-align: right; font-weight: 600;">${bal.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} ₺</td>
+        <td style="padding: 6px 2px; text-align: right;">%${actualPct.toFixed(1)}</td>
+        <td style="padding: 6px 2px; text-align: right; color: var(--color-text-muted);">%${targetPct.toFixed(0)}</td>
+        <td style="padding: 6px 2px; text-align: right; font-weight: 600; color: ${devColor};">${devSign}${deviation.toFixed(1)}%</td>
+      `;
+      allocationTbody.appendChild(tr);
+    });
+  }
+  
+  // D. Grafikleri Çizme
+  const c = getChartThemeColors();
+  
   const barCtx = document.getElementById('report-bar-chart').getContext('2d');
   if (state.charts.bar) {
     state.charts.bar.destroy();
@@ -1388,10 +1771,12 @@ function updateReports() {
       scales: {
         y: {
           beginAtZero: true,
-          grid: { display: false }
+          grid: { color: c.gridColor },
+          ticks: { color: c.textColor }
         },
         x: {
-          grid: { display: false }
+          grid: { display: false },
+          ticks: { color: c.textColor }
         }
       }
     }
@@ -1420,19 +1805,19 @@ function updateReports() {
     donutData.push(asset.quantity * currentPrice);
     
     if (asset.type === 'gold') {
-      donutColors.push('rgba(255, 193, 7, 0.7)'); // Amber
+      donutColors.push('rgba(255, 193, 7, 0.7)'); 
     } else if (asset.type === 'silver') {
-      donutColors.push('rgba(176, 190, 197, 0.7)'); // Silver
+      donutColors.push('rgba(176, 190, 197, 0.7)'); 
     } else if (asset.type === 'stock') {
-      donutColors.push('rgba(30, 136, 229, 0.7)'); // BIST Blue
+      donutColors.push('rgba(30, 136, 229, 0.7)'); 
     } else if (asset.type === 'fund') {
-      donutColors.push('rgba(156, 39, 176, 0.7)'); // Fund Purple
+      donutColors.push('rgba(156, 39, 176, 0.7)'); 
     } else if (asset.type === 'bes') {
-      donutColors.push('rgba(255, 112, 67, 0.7)'); // BES Orange
+      donutColors.push('rgba(255, 112, 67, 0.7)'); 
     } else if (asset.type === 'currency') {
-      donutColors.push('rgba(76, 175, 80, 0.7)'); // Forex Green
+      donutColors.push('rgba(76, 175, 80, 0.7)'); 
     } else {
-      donutColors.push('rgba(141, 110, 99, 0.7)'); // Sage / Other Brown
+      donutColors.push('rgba(141, 110, 99, 0.7)'); 
     }
   });
   
@@ -1455,7 +1840,8 @@ function updateReports() {
           position: 'right',
           labels: {
             boxWidth: 12,
-            font: { size: 10 }
+            color: c.textColor,
+            font: { size: 9 }
           }
         }
       },
@@ -1616,6 +2002,28 @@ function registerEvents() {
     document.getElementById('settings-old-pin').value = '';
     document.getElementById('settings-new-pin').value = '';
     document.getElementById('settings-wealth-goal').value = getWealthGoal();
+    
+    // Bütçe limitlerini doldur
+    const limits = getBudgetLimits();
+    document.getElementById('budget-rent').value = limits.rent || '';
+    document.getElementById('budget-groceries').value = limits.groceries || '';
+    document.getElementById('budget-dining').value = limits.dining || '';
+    document.getElementById('budget-transport').value = limits.transport || '';
+    document.getElementById('budget-bills').value = limits.bills || '';
+    document.getElementById('budget-entertainment').value = limits.entertainment || '';
+    
+    // Yatırım hedef dağılımlarını doldur
+    const targets = getAllocationTargets();
+    document.getElementById('target-gold').value = targets.gold || 0;
+    document.getElementById('target-silver').value = targets.silver || 0;
+    document.getElementById('target-stock').value = targets.stock || 0;
+    document.getElementById('target-fund').value = targets.fund || 0;
+    document.getElementById('target-bes').value = targets.bes || 0;
+    document.getElementById('target-currency').value = targets.currency || 0;
+    document.getElementById('target-cash').value = targets.cash || 0;
+    document.getElementById('target-other').value = targets.other || 0;
+    
+    updateTargetAllocationTotalSum();
     modalSettings.classList.add('active');
   });
   document.getElementById('modal-settings-close').addEventListener('click', () => modalSettings.classList.remove('active'));
@@ -1708,16 +2116,155 @@ function registerEvents() {
     }
   });
 
-  document.getElementById('btn-export-csv').addEventListener('click', () => {
-    exportToCSV();
-  });
-  
   document.getElementById('btn-export-pdf').addEventListener('click', () => {
     window.print();
   });
 
   document.getElementById('report-month-select').addEventListener('change', () => {
     updateReports();
+  });
+
+  // Kategori Bütçe limit formu submit dinleyicisi
+  document.getElementById('form-budget-limits').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const limits = {
+      rent: parseFloat(document.getElementById('budget-rent').value) || 0,
+      groceries: parseFloat(document.getElementById('budget-groceries').value) || 0,
+      dining: parseFloat(document.getElementById('budget-dining').value) || 0,
+      transport: parseFloat(document.getElementById('budget-transport').value) || 0,
+      bills: parseFloat(document.getElementById('budget-bills').value) || 0,
+      entertainment: parseFloat(document.getElementById('budget-entertainment').value) || 0,
+      other_expense: parseFloat(getBudgetLimits().other_expense) || 0
+    };
+    setBudgetLimits(limits);
+    alert('Bütçe limitleri başarıyla güncellendi! 🍃');
+    modalSettings.classList.remove('active');
+    refreshScreenData(state.currentScreen);
+  });
+
+  // Yatırım hedef dağılım formu submit dinleyicisi
+  document.getElementById('form-allocation-targets').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const gold = parseFloat(document.getElementById('target-gold').value) || 0;
+    const silver = parseFloat(document.getElementById('target-silver').value) || 0;
+    const stock = parseFloat(document.getElementById('target-stock').value) || 0;
+    const fund = parseFloat(document.getElementById('target-fund').value) || 0;
+    const bes = parseFloat(document.getElementById('target-bes').value) || 0;
+    const currency = parseFloat(document.getElementById('target-currency').value) || 0;
+    const cash = parseFloat(document.getElementById('target-cash').value) || 0;
+    const other = parseFloat(document.getElementById('target-other').value) || 0;
+    
+    const total = gold + silver + stock + fund + bes + currency + cash + other;
+    if (total !== 100) {
+      alert(`Hata: Hedef yüzdelerin toplamı %100 olmalıdır. Şu anki toplam: %${total}`);
+      return;
+    }
+    
+    const targets = { gold, silver, stock, fund, bes, currency, cash, other };
+    setAllocationTargets(targets);
+    alert('Yatırım hedef dağılım payları güncellendi! ⚖️');
+    modalSettings.classList.remove('active');
+    refreshScreenData(state.currentScreen);
+  });
+
+  // Dağılım formu giriş alanlarındaki değişiklikleri anlık dinle ve toplamı güncelle
+  const targetInputs = ['target-gold', 'target-silver', 'target-stock', 'target-fund', 'target-bes', 'target-currency', 'target-cash', 'target-other'];
+  targetInputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', updateTargetAllocationTotalSum);
+    }
+  });
+
+  // Koyu/Açık Tema Seçim butonları dinleyicileri
+  const applyTheme = (theme) => {
+    setAppTheme(theme);
+    if (theme === 'dark') {
+      document.body.classList.add('dark-theme');
+      document.getElementById('btn-theme-dark').style.fontWeight = '600';
+      document.getElementById('btn-theme-dark').style.backgroundColor = 'var(--color-mint-deep)';
+      document.getElementById('btn-theme-dark').style.color = 'var(--color-text-on-dark)';
+      document.getElementById('btn-theme-light').style.fontWeight = '500';
+      document.getElementById('btn-theme-light').style.backgroundColor = 'transparent';
+      document.getElementById('btn-theme-light').style.color = 'var(--color-text)';
+    } else {
+      document.body.classList.remove('dark-theme');
+      document.getElementById('btn-theme-light').style.fontWeight = '600';
+      document.getElementById('btn-theme-light').style.backgroundColor = 'var(--color-mint-deep)';
+      document.getElementById('btn-theme-light').style.color = 'var(--color-text-on-dark)';
+      document.getElementById('btn-theme-dark').style.fontWeight = '500';
+      document.getElementById('btn-theme-dark').style.backgroundColor = 'transparent';
+      document.getElementById('btn-theme-dark').style.color = 'var(--color-text)';
+    }
+    refreshScreenData(state.currentScreen);
+  };
+  
+  document.getElementById('btn-theme-light').addEventListener('click', () => applyTheme('light'));
+  document.getElementById('btn-theme-dark').addEventListener('click', () => applyTheme('dark'));
+
+  // JSON Yedek Dosyası Dışa Aktarma (Export)
+  document.getElementById('btn-export-json').addEventListener('click', () => {
+    const backupData = {
+      version: 'ferahfinans_v1',
+      date: new Date().toISOString(),
+      transactions: getTransactions(),
+      assets: getAssets(),
+      wealth_goal: getWealthGoal(),
+      pin: getPin(),
+      name: getUserName(),
+      theme: getAppTheme(),
+      budget_limits: getBudgetLimits(),
+      allocation_targets: getAllocationTargets()
+    };
+    
+    const dataStr = JSON.stringify(backupData, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `FerahFinans_Yedek_${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+  
+  // JSON Yedek Geri Yükleme (Import)
+  const fileInput = document.getElementById('import-json-file');
+  document.getElementById('btn-import-json-trigger').addEventListener('click', () => {
+    fileInput.click();
+  });
+  
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const data = JSON.parse(evt.target.result);
+        
+        if (data.version !== 'ferahfinans_v1') {
+          throw new Error('Geçersiz yedek dosyası formatı!');
+        }
+        
+        if (confirm('DİKKAT: Bu yedek dosyasını yüklerseniz, uygulamadaki mevcut tüm verileriniz silinecektir. Devam etmek istiyor musunuz?')) {
+          if (data.transactions) localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(data.transactions));
+          if (data.assets) localStorage.setItem(STORAGE_KEYS.ASSETS, JSON.stringify(data.assets));
+          if (data.wealth_goal) localStorage.setItem(STORAGE_KEYS.WEALTH_GOAL, data.wealth_goal.toString());
+          if (data.pin) localStorage.setItem(STORAGE_KEYS.PIN, JSON.stringify(data.pin));
+          if (data.name) localStorage.setItem(STORAGE_KEYS.NAME, JSON.stringify(data.name));
+          if (data.theme) localStorage.setItem(STORAGE_KEYS.THEME, data.theme);
+          if (data.budget_limits) localStorage.setItem(STORAGE_KEYS.BUDGET_LIMITS, JSON.stringify(data.budget_limits));
+          if (data.allocation_targets) localStorage.setItem(STORAGE_KEYS.ALLOCATION_TARGETS, JSON.stringify(data.allocation_targets));
+          localStorage.setItem(STORAGE_KEYS.IS_INITIALIZED, 'true');
+          
+          alert('Verileriniz başarıyla geri yüklendi! Uygulama yeniden başlatılıyor.');
+          window.location.reload();
+        }
+      } catch (err) {
+        alert('Yükleme hatası: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
   });
 }
 

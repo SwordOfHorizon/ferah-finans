@@ -21,23 +21,9 @@
 
   <!-- MASAÜSTÜ İÇİN TELEFON ÇERÇEVESİ SİMÜLATÖRÜ -->
   <div class="mobile-frame-wrapper">
-    <!-- Üst Çentik / Ahize -->
-    <div class="mobile-frame-notch">
-      <div class="mobile-frame-camera"></div>
-    </div>
-    
-    <!-- Üst Durum Çubuğu -->
-    <div class="mobile-status-bar">
-      <div class="status-left" id="live-time">10:04</div>
-      <div class="status-right">
-        <i data-lucide="wifi" style="width: 14px; height: 14px;"></i>
-        <span style="font-size: 10px;">5G</span>
-        <i data-lucide="battery" style="width: 16px; height: 16px;"></i>
-      </div>
-    </div>
 
     <!-- UYGULAMA İÇERİĞİ -->
-    <main class="app-container" id="app-root">
+    <main class="app-container" id="app-root" style="border-radius: 38px;">
 
       <!-- ================= 0. PIN KODU EKRANI ================= -->
       <section id="screen-pin" class="pin-screen">
@@ -85,7 +71,7 @@
       <!-- ================= 1. ÖZET EKRANI (DASHBOARD) ================= -->
       <section id="screen-dashboard" class="screen">
         <!-- Başlık Bölümü -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
           <div>
             <h1 style="font-size: 24px; font-weight: 700;" id="dashboard-welcome-title">Selam, Ferah Ol 🍃</h1>
             <p style="font-size: 13px; color: var(--color-text-muted);" id="dashboard-date">Haziran 2026</p>
@@ -93,6 +79,12 @@
           <button class="icon-btn" id="btn-settings-open" title="Ayarlar">
             <i data-lucide="settings" style="width: 18px; height: 18px;"></i>
           </button>
+        </div>
+
+        <!-- Zen Günlük Tavsiye / Söz -->
+        <div id="zen-quote-container" class="zen-quote-box" style="margin-bottom: 16px;">
+          <i data-lucide="sparkles" style="width: 16px; height: 16px; color: var(--color-mint-deep); flex-shrink: 0;"></i>
+          <p id="zen-quote-text" style="font-size: 12px; font-style: italic; margin: 0; line-height: 1.4; color: var(--color-text);"></p>
         </div>
 
         <!-- Net Varlık Kartı (Glassmorphic) -->
@@ -239,7 +231,7 @@
       <section id="screen-reports" class="screen">
         <!-- Yazıcı İçin Özel Logo/Başlık Alanı (Sadece Print modunda görünür) -->
         <div class="print-only print-header-container" style="display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-mint-deep); padding-bottom: 12px; margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-mint-deep); padding-bottom: 12px; margin-bottom: 20px;">
             <div>
               <h1 style="font-size: 26px; color: var(--color-mint-deep); font-weight: 700; display: flex; align-items: center; gap: 8px;">
                 FerahFinans Raporu 🍃
@@ -256,11 +248,8 @@
         <div class="reports-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
           <h1 style="font-size: 24px; font-weight: 700;">Aylık Rapor</h1>
           <div style="display: flex; gap: 6px;">
-            <button class="icon-btn" id="btn-export-csv" title="Excel/CSV Dışa Aktar">
-              <i data-lucide="download" style="width: 16px; height: 16px;"></i>
-            </button>
-            <button class="btn btn-primary" id="btn-export-pdf" style="padding: 8px 14px; font-size: 12px;">
-              <i data-lucide="printer" style="width: 15px; height: 15px;"></i> Yazdır / PDF
+            <button class="btn btn-primary" id="btn-export-pdf" style="padding: 8px 14px; font-size: 12px; font-weight: 600;">
+              <i data-lucide="file-text" style="width: 15px; height: 15px;"></i> Rapor Oluştur
             </button>
           </div>
         </div>
@@ -276,43 +265,77 @@
         <!-- Ay Başlığı -->
         <h2 id="report-title-month" style="font-size: 18px; margin-bottom: 12px; text-align: center; color: var(--color-forest);">Mayıs 2026 Rapor Özetiniz</h2>
 
-        <!-- Finansal Denge Mini Özeti (Karşılaştırmalı) -->
-        <div class="report-balance-summary">
-          <div class="report-mini-card success">
-            <div style="font-size: 11px; color: var(--color-text-muted);">Toplam Gelir</div>
-            <div style="font-size: 16px; font-weight: 700; color: var(--color-mint-deep);" id="report-total-income">0 ₺</div>
-          </div>
-          
-          <div class="report-mini-card danger">
-            <div style="font-size: 11px; color: var(--color-text-muted);">Toplam Gider</div>
-            <div style="font-size: 16px; font-weight: 700; color: var(--color-accent-red);" id="report-total-expense">0 ₺</div>
+        <!-- 1. Zen Wellness Değerlendirmesi -->
+        <div class="card wellness-card" id="report-wellness-card" style="background: linear-gradient(135deg, rgba(232,245,233,0.8) 0%, rgba(255,255,255,0.9) 100%); border-color: var(--color-sage); padding: 16px 20px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+            <div style="flex: 1;">
+              <h3 style="font-size: 15px; margin-bottom: 4px; color: var(--color-forest);">Finansal Ferahlık Değerlendirmesi</h3>
+              <p id="report-wellness-text" style="font-size: 12px; color: var(--color-text-muted); line-height: 1.45; margin-bottom: 8px; font-style: italic;">
+                Finansal ferahlık verileriniz analiz edilerek değerlendirme oluşturuluyor...
+              </p>
+              <div id="report-wellness-badge" style="display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: var(--radius-full); background: var(--color-mint-light); color: var(--color-mint-deep);">
+                Ferahlık Akışı 🍃
+              </div>
+            </div>
+            <!-- Dairesel Skor Göstergesi -->
+            <div style="position: relative; width: 68px; height: 68px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 10px;">
+              <svg width="68" height="68" viewBox="0 0 36 36" style="transform: rotate(-90deg); width: 68px; height: 68px;">
+                <circle cx="18" cy="18" r="15.915" fill="none" stroke="var(--color-mint-light)" stroke-width="3" />
+                <circle id="report-wellness-circle" cx="18" cy="18" r="15.915" fill="none" stroke="var(--color-mint-deep)" stroke-width="3" stroke-dasharray="0 100" style="transition: stroke-dasharray 1.2s cubic-bezier(0.4, 0, 0.2, 1);" />
+              </svg>
+              <div id="report-wellness-score" style="position: absolute; font-family: var(--font-heading); font-size: 16px; font-weight: 700; color: var(--color-forest);">0</div>
+            </div>
           </div>
         </div>
 
-        <!-- Tasarruf ve Yatırım Performans Analizi Kartı -->
-        <div class="card">
-          <h3 style="font-size: 14px; margin-bottom: 12px; border-bottom: 1px solid var(--color-card-border); padding-bottom: 6px;">Performans Metrikleri</h3>
-          
-          <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: var(--color-text-muted);">Net Tasarruf Kazancı:</span>
-              <strong id="report-net-savings" style="color: var(--color-mint-deep);">+0.00 ₺</strong>
+        <!-- Finansal Denge ve Performans Metrikleri Satırı (Yan Yana) -->
+        <div class="report-print-row">
+          <!-- Finansal Denge Mini Özeti (Karşılaştırmalı) -->
+          <div class="report-balance-summary">
+            <div class="report-mini-card success">
+              <div style="font-size: 11px; color: var(--color-text-muted);">Toplam Gelir</div>
+              <div style="font-size: 16px; font-weight: 700; color: var(--color-mint-deep);" id="report-total-income">0 ₺</div>
             </div>
             
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: var(--color-text-muted);">Tasarruf Oranınız:</span>
-              <span style="background: var(--color-mint-light); color: var(--color-mint-deep); padding: 1px 8px; border-radius: var(--radius-full); font-weight: 600;" id="report-savings-rate">%0</span>
+            <div class="report-mini-card danger">
+              <div style="font-size: 11px; color: var(--color-text-muted);">Toplam Gider</div>
+              <div style="font-size: 16px; font-weight: 700; color: var(--color-accent-red);" id="report-total-expense">0 ₺</div>
             </div>
+          </div>
+
+          <!-- Tasarruf ve Yatırım Performans Analizi Kartı -->
+          <div class="card" style="margin-bottom: 0;">
+            <h3 style="font-size: 14px; margin-bottom: 12px; border-bottom: 1px solid var(--color-card-border); padding-bottom: 6px;">Performans Metrikleri</h3>
             
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: var(--color-text-muted);">Yatırım Getirisi (Kâr/Zarar):</span>
-              <strong id="report-investment-earnings" style="color: var(--color-forest);">+0.00 ₺</strong>
+            <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--color-text-muted);">Net Tasarruf Kazancı:</span>
+                <strong id="report-net-savings" style="color: var(--color-mint-deep);">+0.00 ₺</strong>
+              </div>
+              
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--color-text-muted);">Tasarruf Oranınız:</span>
+                <span style="background: var(--color-mint-light); color: var(--color-mint-deep); padding: 1px 8px; border-radius: var(--radius-full); font-weight: 600;" id="report-savings-rate">%0</span>
+              </div>
+              
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--color-text-muted);">Yatırım Getirisi (Kâr/Zarar):</span>
+                <strong id="report-investment-earnings" style="color: var(--color-forest);">+0.00 ₺</strong>
+              </div>
+              
+              <div style="display: flex; justify-content: space-between; border-top: 1px dashed var(--color-sage); padding-top: 10px; font-size: 14px;">
+                <span style="font-weight: 600; color: var(--color-forest);">Toplam Büyüme (Ay Sonu):</span>
+                <strong id="report-total-growth-val" style="color: var(--color-mint-deep);">+0.00 ₺</strong>
+              </div>
             </div>
-            
-            <div style="display: flex; justify-content: space-between; border-top: 1px dashed var(--color-sage); padding-top: 10px; font-size: 14px;">
-              <span style="font-weight: 600; color: var(--color-forest);">Toplam Büyüme (Ay Sonu):</span>
-              <strong id="report-total-growth-val" style="color: var(--color-mint-deep);">+0.00 ₺</strong>
-            </div>
+          </div>
+        </div>
+
+        <!-- Kategori Bütçe Limit Kıyaslama -->
+        <div class="card" id="report-budget-limits-card">
+          <h3 style="font-size: 14px; margin-bottom: 8px; border-bottom: 1px solid var(--color-card-border); padding-bottom: 6px;">Kategori Limit ve Bütçe Durumu</h3>
+          <div style="display: flex; flex-direction: column; gap: 10px;" id="report-budget-limits-list">
+            <!-- Javascript dinamik dolduracak -->
           </div>
         </div>
 
@@ -324,19 +347,52 @@
           </div>
         </div>
 
-        <!-- Varlık Dağılımı Daire Grafiği -->
-        <div class="card">
-          <h3 style="font-size: 14px; margin-bottom: 6px;">Varlık Dağılım Payı</h3>
-          <div class="chart-container" style="height: 180px;">
-            <canvas id="report-donut-chart"></canvas>
+        <!-- Varlık Dağılımı ve Portföy Kıyaslama Satırı (Yan Yana ve Sayfa Kesmeli) -->
+        <div class="report-print-row print-page-break">
+          <!-- Varlık Dağılımı Daire Grafiği ve Hedef Analizi -->
+          <div class="card" style="margin-bottom: 0;">
+            <h3 style="font-size: 14px; margin-bottom: 6px;">Varlık Dağılım Payı</h3>
+            <div class="chart-container" style="height: 180px;">
+              <canvas id="report-donut-chart"></canvas>
+            </div>
+          </div>
+
+          <!-- Portföy Dağılım ve Hedef Karşılaştırma Tablosu -->
+          <div class="card" id="report-allocation-card" style="margin-bottom: 0;">
+            <h3 style="font-size: 14px; margin-bottom: 8px; border-bottom: 1px solid var(--color-card-border); padding-bottom: 6px;">Portföy Hedef Kıyaslama</h3>
+            <div style="overflow-x: auto; width: 100%;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: left;" id="report-allocation-table">
+                <thead>
+                  <tr style="border-bottom: 1.5px solid var(--color-sage); color: var(--color-text-muted); font-weight: 600;">
+                    <th style="padding: 6px 2px;">Varlık Türü</th>
+                    <th style="padding: 6px 2px; text-align: right;">Bakiye</th>
+                    <th style="padding: 6px 2px; text-align: right;">Mevcut Pay</th>
+                    <th style="padding: 6px 2px; text-align: right;">Hedef Pay</th>
+                    <th style="padding: 6px 2px; text-align: right;">Sapma</th>
+                  </tr>
+                </thead>
+                <tbody id="report-allocation-tbody">
+                  <!-- Javascript dinamik dolduracak -->
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
         <!-- Aylık Finansal Gelişim & Tasarruf Eğilimi (Karşılaştırma Grafiği) -->
-        <div class="card">
+        <div class="card" style="margin-bottom: 0;">
           <h3 style="font-size: 14px; margin-bottom: 6px;">Aylık Gelişim & Tasarruf Eğilimi (Son 6 Ay)</h3>
           <div class="chart-container" style="height: 220px;">
             <canvas id="report-trend-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Yazıcı İçin İmza Alanı (Sadece Print modunda görünür) -->
+        <div class="print-only" style="display: none; margin-top: 30px; border-top: 1px solid var(--color-sage); padding-top: 12px; font-size: 11px; text-align: center; color: var(--color-text-muted);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>FerahFinans Raporlama Servisi</span>
+            <span>Rapor İmza Yetkilisi: <strong id="print-signature-name" style="color: var(--color-forest);">Ferah Kullanıcısı</strong></span>
+            <span>İmza: __________________</span>
           </div>
         </div>
       </section>
@@ -476,6 +532,92 @@
       </div>
       
       <div style="display: flex; flex-direction: column; gap: 16px;">
+        <!-- Tema Seçimi -->
+        <div class="card" style="padding: 16px; margin-bottom: 0;">
+          <h4 style="font-size: 14px; margin-bottom: 10px;">Zen Tema Seçimi 🍃</h4>
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn btn-secondary" id="btn-theme-light" style="flex: 1; padding: 8px; font-size: 12px; font-weight: 600;">Açık Tema ☀️</button>
+            <button type="button" class="btn btn-secondary" id="btn-theme-dark" style="flex: 1; padding: 8px; font-size: 12px; font-weight: 500;">Koyu Tema 🌙</button>
+          </div>
+        </div>
+
+        <!-- Bütçe Limitleri -->
+        <div class="card" style="padding: 16px; margin-bottom: 0;">
+          <h4 style="font-size: 14px; margin-bottom: 8px;">Aylık Kategori Bütçe Sınırları (₺)</h4>
+          <form id="form-budget-limits">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; margin-bottom: 10px;">
+              <div>
+                <label class="form-label" style="font-size: 11px; margin-bottom: 2px;">Kira/Ev</label>
+                <input type="number" id="budget-rent" class="form-input" style="padding: 6px 10px; font-size: 12px; height: 32px;" placeholder="Sınır Yok">
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 11px; margin-bottom: 2px;">Market/Gıda</label>
+                <input type="number" id="budget-groceries" class="form-input" style="padding: 6px 10px; font-size: 12px; height: 32px;" placeholder="Sınır Yok">
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 11px; margin-bottom: 2px;">Yeme/İçme</label>
+                <input type="number" id="budget-dining" class="form-input" style="padding: 6px 10px; font-size: 12px; height: 32px;" placeholder="Sınır Yok">
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 11px; margin-bottom: 2px;">Ulaşım</label>
+                <input type="number" id="budget-transport" class="form-input" style="padding: 6px 10px; font-size: 12px; height: 32px;" placeholder="Sınır Yok">
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 11px; margin-bottom: 2px;">Faturalar</label>
+                <input type="number" id="budget-bills" class="form-input" style="padding: 6px 10px; font-size: 12px; height: 32px;" placeholder="Sınır Yok">
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 11px; margin-bottom: 2px;">Eğlence</label>
+                <input type="number" id="budget-entertainment" class="form-input" style="padding: 6px 10px; font-size: 12px; height: 32px;" placeholder="Sınır Yok">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-secondary" style="width: 100%; padding: 8px; font-size: 12px;">Limitleri Güncelle</button>
+          </form>
+        </div>
+
+        <!-- Yatırım Hedef Dağılımı -->
+        <div class="card" style="padding: 16px; margin-bottom: 0;">
+          <h4 style="font-size: 14px; margin-bottom: 8px;">Yatırım Hedef Dağılım Payları (%)</h4>
+          <form id="form-allocation-targets">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; font-size: 11px; margin-bottom: 10px;">
+              <div>
+                <label class="form-label" style="font-size: 10px; margin-bottom: 2px;">Altın</label>
+                <input type="number" id="target-gold" class="form-input" style="padding: 4px; font-size: 11px; text-align: center; height: 28px;" placeholder="0" min="0" max="100">
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 10px; margin-bottom: 2px;">Gümüş</label>
+                <input type="number" id="target-silver" class="form-input" style="padding: 4px; font-size: 11px; text-align: center; height: 28px;" placeholder="0" min="0" max="100">
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 10px; margin-bottom: 2px;">Hisse</label>
+                <input type="number" id="target-stock" class="form-input" style="padding: 4px; font-size: 11px; text-align: center; height: 28px;" placeholder="0" min="0" max="100">
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 10px; margin-bottom: 2px;">Fon</label>
+                <input type="number" id="target-fund" class="form-input" style="padding: 4px; font-size: 11px; text-align: center; height: 28px;" placeholder="0" min="0" max="100">
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 10px; margin-bottom: 2px;">BES</label>
+                <input type="number" id="target-bes" class="form-input" style="padding: 4px; font-size: 11px; text-align: center; height: 28px;" placeholder="0" min="0" max="100">
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 10px; margin-bottom: 2px;">Döviz</label>
+                <input type="number" id="target-currency" class="form-input" style="padding: 4px; font-size: 11px; text-align: center; height: 28px;" placeholder="0" min="0" max="100">
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 10px; margin-bottom: 2px;">Nakit</label>
+                <input type="number" id="target-cash" class="form-input" style="padding: 4px; font-size: 11px; text-align: center; height: 28px;" placeholder="0" min="0" max="100">
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 10px; margin-bottom: 2px;">Diğer</label>
+                <input type="number" id="target-other" class="form-input" style="padding: 4px; font-size: 11px; text-align: center; height: 28px;" placeholder="0" min="0" max="100">
+              </div>
+            </div>
+            <div id="target-total-check" style="font-size: 11px; margin-bottom: 8px; text-align: right; font-weight: 600; color: var(--color-text-muted);">Toplam: %0</div>
+            <button type="submit" class="btn btn-secondary" style="width: 100%; padding: 8px; font-size: 12px;">Dağılımı Kaydet</button>
+          </form>
+        </div>
+
         <!-- PIN Değiştirme -->
         <div class="card" style="padding: 16px; margin-bottom: 0;">
           <h4 style="font-size: 14px; margin-bottom: 10px;">PIN Kodunu Değiştir</h4>
@@ -499,6 +641,16 @@
             </div>
             <button type="submit" class="btn btn-secondary" style="width: 100%; padding: 8px;">Hedefi Güncelle</button>
           </form>
+        </div>
+
+        <!-- Veri Yedekleme -->
+        <div class="card" style="padding: 16px; margin-bottom: 0;">
+          <h4 style="font-size: 14px; margin-bottom: 10px;">Veri Yedekleme & Geri Yükleme</h4>
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn btn-secondary" id="btn-export-json" style="flex: 1; padding: 8px; font-size: 12px;">Yedekle (JSON) 📤</button>
+            <button type="button" class="btn btn-secondary" id="btn-import-json-trigger" style="flex: 1; padding: 8px; font-size: 12px;">Geri Yükle 📥</button>
+            <input type="file" id="import-json-file" accept=".json" style="display: none;">
+          </div>
         </div>
 
         <!-- Bakiye Temizleme -->
