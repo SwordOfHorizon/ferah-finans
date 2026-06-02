@@ -95,7 +95,7 @@ h1, h2, h3, h4, h5, h6 {
   background: radial-gradient(ellipse at bottom, var(--color-mint-light) 0%, var(--color-bg-light) 100%);
   overflow-y: auto;
   position: relative;
-  border-radius: 38px;
+  border-radius: 0 0 38px 38px;
   padding-top: calc(env(safe-area-inset-top, 0px) + 16px); /* Çentik desteği ve bezel-less ekran için şık bir üst boşluk */
   scrollbar-width: none; /* Firefox */
 }
@@ -506,6 +506,31 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding: 4px; /* Hover ölçeklemesinde sınırların kırpılmasını önlemek için güvenli iç boşluk */
+}
+
+/* Dinamik Kayan Yazı (Marquee) Efekti */
+.marquee-text {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.transaction-item:hover .marquee-text {
+  text-overflow: clip !important;
+  display: inline-block !important;
+  width: auto !important;
+  animation: universal-marquee 8s linear infinite !important;
+  padding-right: 40px !important;
+}
+
+@keyframes universal-marquee {
+  0% { transform: translateX(0); }
+  15% { transform: translateX(0); } /* Başlangıçta bekleme */
+  85% { transform: translateX(calc(-100% + 140px)); } /* Yazının sonuna kadar kayma */
+  100% { transform: translateX(0); } /* Başa dönme */
 }
 
 .transaction-item {

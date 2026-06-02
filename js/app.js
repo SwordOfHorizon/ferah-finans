@@ -171,11 +171,11 @@ const DEFAULT_GOALS = [
 
 function initDatabase() {
   if (!localStorage.getItem(STORAGE_KEYS.IS_INITIALIZED)) {
-    localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(DEFAULT_TRANSACTIONS));
-    localStorage.setItem(STORAGE_KEYS.ASSETS, JSON.stringify(DEFAULT_ASSETS));
-    localStorage.setItem(STORAGE_KEYS.GOALS, JSON.stringify(DEFAULT_GOALS));
+    localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify([]));
+    localStorage.setItem(STORAGE_KEYS.ASSETS, JSON.stringify([]));
+    localStorage.setItem(STORAGE_KEYS.GOALS, JSON.stringify([]));
     localStorage.setItem(STORAGE_KEYS.IS_INITIALIZED, 'true');
-    console.log('FerahFinans veritabanı başarıyla varsayılan verilerle başlatıldı.');
+    console.log('FerahFinans veritabanı başarıyla boş (temiz) olarak başlatıldı.');
   }
 }
 
@@ -1118,12 +1118,13 @@ function updateInvestments() {
       badgeLabel = 'Döviz';
     }
     
+    const hasAssetMarquee = asset.name && asset.name.length > 20;
     card.innerHTML = `
       <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="display: inline-block; width: 8px; height: 8px; background: ${badgeColor}; border-radius: 50%;"></span>
-          <strong style="font-size: 15px; color: var(--color-forest);">${asset.name}</strong>
-          <span style="font-size: 10px; padding: 2px 6px; border-radius: var(--radius-full); background: ${badgeColor}15; color: ${badgeColor}; font-weight: 600; margin-left: 4px;">${badgeLabel}</span>
+        <div style="display: flex; align-items: center; gap: 8px; overflow: hidden; min-width: 0; flex: 1;">
+          <span style="display: inline-block; width: 8px; height: 8px; background: ${badgeColor}; border-radius: 50%; flex-shrink: 0;"></span>
+          <strong class="${hasAssetMarquee ? 'marquee-text' : ''}" style="font-size: 15px; color: var(--color-forest); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; max-width: 100%;">${asset.name}</strong>
+          <span style="font-size: 10px; padding: 2px 6px; border-radius: var(--radius-full); background: ${badgeColor}15; color: ${badgeColor}; font-weight: 600; margin-left: 4px; flex-shrink: 0;">${badgeLabel}</span>
         </div>
         <div style="display: flex; gap: 10px; align-items: center;">
           <span style="font-size: 11px; color: var(--color-text-muted);">${asset.quantity} adet</span>
@@ -1863,13 +1864,14 @@ function createTransactionRow(tx, enableDelete = false) {
     color: 'var(--color-sage)'
   };
   
+  const hasMarquee = tx.description && tx.description.length > 22;
   row.innerHTML = `
     <div class="transaction-left">
       <div class="category-icon-wrapper" style="background-color: ${catInfo.color}">
         <i data-lucide="${catInfo.icon}" style="width: 18px; height: 18px;"></i>
       </div>
       <div class="transaction-details">
-        <h4>${tx.description}</h4>
+        <h4 class="${hasMarquee ? 'marquee-text' : ''}">${tx.description}</h4>
         <p>${catInfo.label} • ${formatDate(tx.date)}</p>
       </div>
     </div>
@@ -2116,9 +2118,7 @@ function registerEvents() {
     }
   });
 
-  document.getElementById('btn-export-pdf').addEventListener('click', () => {
-    window.print();
-  });
+
 
   document.getElementById('report-month-select').addEventListener('change', () => {
     updateReports();
